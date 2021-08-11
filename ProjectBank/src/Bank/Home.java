@@ -10,6 +10,7 @@ public class Home {
 	Scanner sc=new Scanner(System.in);
 	
 	void inputValidation1(){
+		System.out.println(".......Home........");
 		System.out.println("Enter 1 for login..");
 		System.out.println("Enter 2 for Registration");
 		int input=sc.nextInt();		
@@ -24,6 +25,7 @@ public class Home {
 	}
 	
 	void login(){
+		System.out.println(".........Login..........");
 		System.out.println("Enter Account Number : ");
 		String acNo=sc.next();
 		System.out.println("Enter PiNo : ");
@@ -33,7 +35,7 @@ public class Home {
 			tempPin=tempPin/10;
 			pinCount++;
 		}
-		if(acNo.length()==16) {
+		if(acNo.length()==16 && !acNo.isEmpty() && acNo!=null) {
 			if(pinCount==4) {
 				loginValues.setAcNo(acNo);
 				loginValues.setPinNo(piNo);
@@ -50,11 +52,24 @@ public class Home {
 	void loginApprv(){
 		String acNo=loginValues.getAcNo();
 		int pinNo=loginValues.getPinNo();
+		
+		if(acNo!=null && pinNo!=0) {
 		acSec.accountDetails(acNo, pinNo);
+		if(acSec.found==true) {
 		acSec.showDetails();
 		inputvalidation2();
+		}else {
+			System.out.println("No records found");
+			inputValidation1();
+		}
+		}
+		else {
+			System.out.println("Values are Null !! try again");
+			inputValidation1();
+		}
 	}
 	 void registerStep() {
+		 System.out.println("........Register.......");
 		System.out.println("ENter your name : ");
 		String rAcname=sc.next();
 		System.out.println("Enter your Acno : ");
@@ -66,8 +81,8 @@ public class Home {
 		System.out.println("Retype the PinNo : "+rPinNo);
 		int inPin=sc.nextInt();
 		
-		if(rAcname.length()!=0) {
-		if(rAcNo.length()==16) {
+		if(rAcname.length()!=0 && !rAcname.isEmpty() && rAcname!=null) {
+		if(rAcNo.length()==16 && !rAcNo.isEmpty() && rAcNo!=null) {
 			if(inPin==rPinNo) {
 			regValues.setRAcname(rAcname);
 			regValues.setRAcNo(rAcNo);
@@ -75,30 +90,35 @@ public class Home {
 			apprvRegiste1();
 		}else {
 			System.out.println("Pin Mismatch");
-			registerStep();
+			inputValidation1();
 		}
 		}else {
 			System.out.println("Enter 16 Digit Account No");
-			registerStep();
+			inputValidation1();
 		}	
 		}else {
-			System.out.println("Name is empty");
-			registerStep();
+			System.out.println("Enter your Name");
+			inputValidation1();
 		}
 	}
 	 void apprvRegiste1() {
 		String rAcName= regValues.getRAcname();
 		String rAcNo= regValues.getRAcNo();
 		int rPinNo=regValues.getrPinNo();
+		if(rAcName!=null && rAcNo!=null && rPinNo!=0) {
 		acReg.register1(rAcName,rAcNo,rPinNo);
-		if(acReg.b==false)
-		{
-			acReg.completeregister();
+		acReg.completeregister();
+		if(acReg.b==true) {
+			System.out.println("Account Successfully Created");
 			login();
-			
 		}else {
-			System.out.println("The Account is already Exists.."+acReg.b);
-			registerStep();
+			System.out.println("The Account is already Exists..");
+			inputValidation1();
+		}
+		}
+		else{
+			System.out.println("Values are null !! try again");
+			inputValidation1();
 		}
 	 }
 	
@@ -106,11 +126,15 @@ public class Home {
 	void inputvalidation2() {
 		System.out.println("Press 1 for Depoist");
 		System.out.println("Press 2 for withdraw");
+		System.out.println("Press 3 for Exit");
 		int in2=sc.nextInt();
 		if(in2==1) {
 			depoist();
 		}else if(in2==2){
 			withdraw();
+
+		}else if(in2==3){
+			inputValidation1();
 
 		}else {
 			System.out.println("Enter a valid option");
@@ -119,9 +143,10 @@ public class Home {
 	}
 	
 	void depoist() {
+		System.out.println(".....Depoist......");
 		System.out.println("Enter your Depoist amount");
 		int dptAmt=sc.nextInt();
-		if(dptAmt!=0) {
+		if(dptAmt!=0 && dptAmt>1) {
 		acSec.depoistSection(dptAmt);
 		acSec.showDetails();
 		inputvalidation2();
@@ -131,9 +156,10 @@ public class Home {
 		}
 	}
 	void withdraw() {
+		System.out.println("......Withdraw......");
 		System.out.println("Enter your withdraw amount");
 		int witAmt=sc.nextInt();
-		if(witAmt!=0) {
+		if(witAmt!=0 && witAmt>1) {
 		acSec.withSection(witAmt);
 		acSec.showDetails();
 		inputvalidation2();
@@ -144,6 +170,7 @@ public class Home {
 		}
 		
 	}
+	
 	
 	public static void main(String[] args) {
 		Home home=new Home();

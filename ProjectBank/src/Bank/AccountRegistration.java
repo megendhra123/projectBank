@@ -5,32 +5,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.InputMismatchException;
 import java.util.Random;
 
 public class AccountRegistration {
 	String rAcName;
 	String rAcNo;
-	Boolean b=false;
+	Boolean b;
 	int gPin;
 	DbConnection db=new DbConnection();
 	void register1(String rAcName, String rAcNo, int rPinNo) {
 		this.rAcName=rAcName;
 		this.rAcNo=rAcNo;
 	}
-	void registerValidate(){
-	  Connection con1=db.getConnection();
-	  Statement s;
-	try {
-		s = con1.createStatement();
-		 ResultSet rs=s.executeQuery("select * from accountDetails2 where AccountNo = "
-                 +rAcNo+" AND PinNo = "+gPin);
-		b=rs.next();
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	 
-	}
+
 	void pinGenerator() {
 		Random r=new Random();
 		int a=r.nextInt(9);
@@ -41,6 +29,7 @@ public class AccountRegistration {
 	public void completeregister() {
 	Connection con2=db.getConnection();
 	PreparedStatement ps;
+	if(con2!=null) {
 	try {
 		ps = con2.prepareStatement("insert into accountDetails2 values (?,?,?,?)");
 		ps.setString(1, rAcName);
@@ -48,13 +37,25 @@ public class AccountRegistration {
 		ps.setInt(3, gPin);
 		ps.setInt(4, 0);
 		ps.executeUpdate();
-		con2.close();
-		System.out.println("Registration Completed");
+		b=true;
 	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		if(e.getErrorCode() == 1062 ){
+	     b=false;
+	    }
+	}catch (InputMismatchException eInMis) {
+			System.out.println("Input Mismatched"+eInMis);
+			
+			
 	}
-
-		
+	finally {
+		try {
+			con2.close();
+		} catch (SQLException e) {
+			System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
+		}
+	}
+	}else {
+		System.out.println("Cannot Connect to Database Try Again..");
+	}
 	}
 }
