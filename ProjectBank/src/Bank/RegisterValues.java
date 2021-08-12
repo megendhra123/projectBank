@@ -1,29 +1,30 @@
 package Bank;
 
+
 public class RegisterValues {
-	String RAcname;
-	String RAcNo;
-	int rPinNo;
+	String RegAcname;
+	String RegAcNo;
+	int RegPinNo;
 	
-	public void setRAcname(String rAcname) {
-		RAcname = rAcname;
+	public void setRegAccname(String RegAcname) {
+		this.RegAcname = RegAcname;
 	}
-	public String getRAcname() {
-		return RAcname;
-	}
-	
-	public void setRAcNo(String rAcNo) {
-		RAcNo = rAcNo;
-	}
-	public String getRAcNo() {
-		return RAcNo;
+	public String getRegAccname() {
+		return RegAcname;
 	}
 	
-	public void setrPinNo(int rPinNo) {
-		this.rPinNo = rPinNo;
+	public void setRegAccNo(String RegAcNo) {
+		this.RegAcNo = RegAcNo;
 	}
-	public int getrPinNo() {
-		return rPinNo;
+	public String getRegAccNo() {
+		return RegAcNo;
+	}
+	
+	public void setRegPinNo(int RegPinNo) {
+		this.RegPinNo = RegPinNo;
+	}
+	public int getRegPinNo() {
+		return RegPinNo;
 	}
 
 }

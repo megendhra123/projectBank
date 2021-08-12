@@ -9,98 +9,119 @@ import java.util.InputMismatchException;
 
 public class AccountSection {
 	DbConnection db=new DbConnection();
-	AccountInformation acInfo=new AccountInformation();
+	AccountInformation accInfo=new AccountInformation();
 	
-	String acNo;
-	String name;
+	String accountNo;
+	String accountName;
 	int pinNo;
-	int avalbal;
-	boolean found;
-	void accountDetails(String acNo,int pinNo){
+	int avalBal;
+	boolean isAccfound;
+	
+	//in accountDetails get account number and pin no from Home.java
+	//and check is account is found or not
+	void accountDetails(String accountNo,int pinNo){
 		
-		this.acNo=acNo;
+		this.accountNo=accountNo;
 		this.pinNo=pinNo;
 		
-	    Connection con1=db.getConnection();
+	    Connection connection=db.getConnection();   
 	    Statement s;
 	try {
-		s=con1.createStatement();
-		ResultSet rs=s.executeQuery("select * from accountDetails2 where AccountNo = "+acNo+" AND Pin = "+pinNo);
+		s=connection.createStatement();
+		
+		//selecting records from database by account number and pin number
+		ResultSet rs=s.executeQuery("select * from accountDetails2 where AccountNo = "+accountNo+" AND Pin = "+pinNo); 
+		
 		while(rs.next()) {
-			if(rs.getString(1)==null && rs.getInt(4)==0) {
-				found=false;
+			if(rs.getString(1)==null && rs.getInt(4)==0) {   //checking is account is found or not
+				isAccfound=false;                            //set isAccfound is false if Account not found
 			}else {
-			found=true;
-			acInfo.setAcName(rs.getString(1));
-			acInfo.setAvalbal(rs.getInt(4));
+			isAccfound=true;                                //if account found
+			accInfo.setAccountName(rs.getString(1));      //getting data from database and set Account Information 
+			accInfo.setAvailableBalance(rs.getInt(4));
 			}
 		}
 	} catch (SQLException e) {
 		System.out.println("ERROR OCCURED : "+e+" ERROR CODE : "+e.getErrorCode());
 	}catch (InputMismatchException eInMis) {
 		System.out.println("Input Mismatched"+eInMis);		
+	}catch (NullPointerException nullExp) {
+		System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 	}
 	finally {
 		try {
-			con1.close();
+			connection.close();   //try close the connection
 		} catch (SQLException e) {
-			System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
+			System.out.println("ERROR OCCURED during closing the connection ERROR : "+e.getMessage());
+		}catch (NullPointerException nullExp) {  //if the connection is null this block will execute
+			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 		}
 	}
 	}
 	
+	//showing name and available balance 
 	void showDetails() {
-		accountDetails(acNo, pinNo);
-		this.name=acInfo.getAcName();
-		this.avalbal=acInfo.getAvalbal();
+		accountDetails(accountNo, pinNo);   //call accountDetails method to get updated details after withdraw or deposit
+		this.accountName=accInfo.getAccountName();  
+		this.avalBal=accInfo.getAvailableBalance();
 		System.out.println(".......Account Details......");
-		System.out.println("Name :"+name);
-		System.out.println("Available balance :"+avalbal);
+		System.out.println("Name :"+accountName);
+		System.out.println("Available balance :"+avalBal);
 	}
+	
+	//in deposit section 
 	void depoistSection(int depAmt) {
-		int totAmt=depAmt+avalbal;
-		Connection con2=db.getConnection();
+		int totAmt=depAmt+avalBal;
+		Connection connection=db.getConnection();
 		PreparedStatement ps;
 		try {
-			ps = con2.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
-					  " where AccountNo = "+acNo);
+			ps = connection.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
+					  " where AccountNo = "+accountNo);
 			ps.executeUpdate();
 			System.out.println("Amount depoisted successfully");
 		} catch (SQLException e) {
 			System.out.println("Amount cannot be depoisted try again "+e);
 		}catch (InputMismatchException eInMis) {
 			System.out.println("Input Mismatched"+eInMis);
+		}catch (NullPointerException nullExp) {
+			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 		}
 		finally {
 			try {
-				con2.close();
+				connection.close();
 			} catch (SQLException e) {
 				System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
+			}catch (NullPointerException nullExp) {
+				System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 			}
 		}
 	}
 	
 	void withSection(int witAmt) {
-		if(witAmt<avalbal) {
-		int totAmt=avalbal-witAmt;
-		Connection con2=db.getConnection();
+		if(witAmt<avalBal) {
+		int totAmt=avalBal-witAmt;
+		Connection connection=db.getConnection();
 		PreparedStatement ps;
 		try {
-			ps = con2.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
-					  " where AccountNo = "+acNo);
+			ps = connection.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
+					  " where AccountNo = "+accountNo);
 			ps.executeUpdate();
 			System.out.println("Amount Withdrawed successful");
 		} catch (SQLException e) {
 			System.out.println("Amount cannot be withdraw try again "+e);
 		}catch (InputMismatchException eInMis) {
 			System.out.println("Input Mismatched"+eInMis);
+		}catch (NullPointerException nullExp) {
+			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 		}
 		finally {
 			try {
-				con2.close();
+				connection.close();
 			} catch (SQLException e) {
 				System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
 
+			}catch (NullPointerException nullExp) {
+				System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 			}
 		}
 	}

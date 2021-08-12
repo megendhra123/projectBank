@@ -1,20 +1,20 @@
 package Bank;
 
 public class AccountInformation {
-	String acName;
+	String accName;
 	int avalbal;
 	
-	public void setAcName(String acName) {
-		this.acName = acName;
+	public void setAccountName(String accName) {
+		this.accName = accName;
 	}
-	public String getAcName() {
-		return acName;
+	public String getAccountName() {
+		return accName;
 	}
 	
-	public void setAvalbal(int avalbal) {
+	public void setAvailableBalance(int avalbal) {
 		this.avalbal = avalbal;
 	}
-	public int getAvalbal() {
+	public int getAvailableBalance() {
 		return avalbal;
 	}
 

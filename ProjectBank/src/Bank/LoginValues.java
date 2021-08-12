@@ -1,15 +1,17 @@
 package Bank;
 
+import java.util.Objects;
+
 public class LoginValues {
-	String acNo;
+	String accNo;
 	int PinNo;
 	
 	
-	public void setAcNo(String acNo) {
-		this.acNo = acNo;
+	public void setAccountNo(String accNo) {
+		this.accNo = Objects.requireNonNull(accNo);
 	}
-	public String getAcNo() {
-		return this.acNo;
+	public String getAccountNo() {
+		return this.accNo;
 	}
 	
 	public void setPinNo(int pinNo) {
