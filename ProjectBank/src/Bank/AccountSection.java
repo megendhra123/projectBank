@@ -1,5 +1,6 @@
 package Bank;
 
+import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,9 +25,10 @@ public class AccountSection {
 		this.accountNo=accountNo;
 		this.pinNo=pinNo;
 		
-	    Connection connection=db.getConnection();   
+	    Connection  connection = null;
 	    Statement s;
 	try {
+		connection=db.getConnection();  
 		s=connection.createStatement();
 		
 		//selecting records from database by account number and pin number
@@ -50,10 +52,10 @@ public class AccountSection {
 	}
 	finally {
 		try {
-			connection.close();   //try close the connection
+			connection.close();   //try to close the connection
 		} catch (SQLException e) {
 			System.out.println("ERROR OCCURED during closing the connection ERROR : "+e.getMessage());
-		}catch (NullPointerException nullExp) {  //if the connection is null this block will execute
+		}catch (NullPointerException nullExp) {  //if the connection is null this block will be execute
 			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 		}
 	}
@@ -69,14 +71,14 @@ public class AccountSection {
 		System.out.println("Available balance :"+avalBal);
 	}
 	
-	//in deposit section 
+	//in deposit section the deposit amount will be inserted in database
 	void depoistSection(int depAmt) {
-		int totAmt=depAmt+avalBal;
+		int totAmt=depAmt+avalBal;     //sum the deposit amount and available balance to totAmt 
 		Connection connection=db.getConnection();
 		PreparedStatement ps;
 		try {
 			ps = connection.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
-					  " where AccountNo = "+accountNo);
+					  " where AccountNo = "+accountNo);       //set the total amount in the database
 			ps.executeUpdate();
 			System.out.println("Amount depoisted successfully");
 		} catch (SQLException e) {
@@ -85,26 +87,28 @@ public class AccountSection {
 			System.out.println("Input Mismatched"+eInMis);
 		}catch (NullPointerException nullExp) {
 			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
+		}catch (Exception e) {
+			System.out.println("Server Down...");
 		}
 		finally {
 			try {
-				connection.close();
+				connection.close();                 //try to close the connection
 			} catch (SQLException e) {
 				System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
-			}catch (NullPointerException nullExp) {
+			}catch (NullPointerException nullExp) {   
 				System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 			}
 		}
 	}
 	
 	void withSection(int witAmt) {
-		if(witAmt<avalBal) {
-		int totAmt=avalBal-witAmt;
+		if(witAmt<avalBal) {   //checking the withdrawn amount must less than the available balance
+		int totAmt=avalBal-witAmt;   //less the withdrawn amount from available balance 
 		Connection connection=db.getConnection();
 		PreparedStatement ps;
 		try {
 			ps = connection.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
-					  " where AccountNo = "+accountNo);
+					  " where AccountNo = "+accountNo); //set the total amount in the database
 			ps.executeUpdate();
 			System.out.println("Amount Withdrawed successful");
 		} catch (SQLException e) {
@@ -116,7 +120,7 @@ public class AccountSection {
 		}
 		finally {
 			try {
-				connection.close();
+				connection.close();     //try to close the connection
 			} catch (SQLException e) {
 				System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
 

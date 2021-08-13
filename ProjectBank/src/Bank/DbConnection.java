@@ -13,13 +13,15 @@ public class DbConnection {
   
   Connection getConnection()  {
 	  Connection con = null;
+	 
 	  try {
 		Class.forName("com.mysql.cj.jdbc.Driver");
 		 con=DriverManager.getConnection(url, username, pwd);
 	} catch (ClassNotFoundException e) {
-		e.printStackTrace();
-	} catch (SQLException e) {
-		e.printStackTrace();
+		System.out.println("Server Down"+e.getMessage());
+	} 
+	  catch (SQLException e) {
+		System.out.println("Database error");
 	}
     
 	return con;

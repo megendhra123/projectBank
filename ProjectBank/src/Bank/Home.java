@@ -76,7 +76,7 @@ public class Home {
 	 void register() {
 		 System.out.println("........Register.......");
 		System.out.println("ENter your name : ");
-		String regAccountName=null;//change by me
+		String regAccountName=sc.next();
 		System.out.println("Enter your Acno : ");
 		String regAccountNo=sc.next();
 		
@@ -106,7 +106,7 @@ public class Home {
 			if(regAccountNo!=null && regAccountNo.length()==16  && !regAccountNo.isEmpty()) {   
 				
 		accRegistration.register1(regAccountName,regAccountNo,regPinNo);   //control goes to register method
-		accRegistration.completeregister();
+		accRegistration.completeRegister();
 		
 		if(accRegistration.isAccRegistered==true) {                  //checking if the registration is complete or not
 			System.out.println("Account Successfully Created");

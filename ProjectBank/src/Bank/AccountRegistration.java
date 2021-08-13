@@ -12,22 +12,26 @@ public class AccountRegistration {
 	Boolean isAccRegistered;
 	int generatePin;
 	DbConnection db=new DbConnection();
+	
+	//getting register account name and account number
 	void register1(String regAccountName, String regAccountNo, int rPinNo) {
 		this.regAccountName=regAccountName;
 		this.regAccountNo=regAccountNo;
 	}
-
+	
+    //in pinGenerator method will generate 4 digit random pin 
 	void pinGenerator() {
 		Random r=new Random();
 		int a=r.nextInt(9);
 		int b=a*a*a;
 		generatePin=a*1000+b;
-		
 	}
-	public void completeregister() {
+	
+	//completeRegister method it insert the new records into database
+	public void completeRegister() {
 	Connection con2=db.getConnection();
 	PreparedStatement ps;
-	if(regAccountName!=null && regAccountNo!=null && generatePin!=0) {
+	if(regAccountName!=null && regAccountNo!=null && generatePin!=0) {  //checking accountName and accountNumber not null and pin not 0
 	if(con2!=null) {
 	try {
 		ps = con2.prepareStatement("insert into accountDetails2 values (?,?,?,?)");
@@ -43,10 +47,12 @@ public class AccountRegistration {
 	    }
 	}catch (InputMismatchException eInMis) {
 			System.out.println("Input Mismatched"+eInMis);	
+	}catch (NullPointerException nullExp) {
+		System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 	}
 	finally {
 		try {
-			con2.close();
+			con2.close();          //try to close the connection
 		} catch (SQLException e) {
 			System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
 		}catch (NullPointerException nullExp) {
