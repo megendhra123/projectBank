@@ -1,140 +1,96 @@
+//updated on 17-08-21
+
 package Bank;
 
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.InputMismatchException;
 
 public class AccountSection {
-	DbConnection db=new DbConnection();
-	AccountInformation accInfo=new AccountInformation();
+	DbConnection dbConnection;
 	
-	String accountNo;
 	String accountName;
-	int pinNo;
-	int avalBal;
-	boolean isAccfound;
+	int availableBalance;
+	boolean isAccountfound;
 	
 	//in accountDetails get account number and pin no from Home.java
 	//and check is account is found or not
-	void accountDetails(String accountNo,int pinNo){
+    public	void getaccountDetails(String accountNo,int pinNo,int amount,String transActionMode){
 		
-		this.accountNo=accountNo;
-		this.pinNo=pinNo;
-		
+    	dbConnection=DbConnection.getInstance();
 	    Connection  connection = null;
 	    Statement s;
-	try {
-		connection=db.getConnection();  
-		s=connection.createStatement();
+	    PreparedStatement ps;
+	    ResultSet rs = null;
+	    connection=dbConnection.getConnection();  
 		
+	    if(connection!=null) {
+	    
+	try {
+		s=connection.createStatement();
+		if(connection!=null) {
 		//selecting records from database by account number and pin number
-		ResultSet rs=s.executeQuery("select * from accountDetails2 where AccountNo = "+accountNo+" AND Pin = "+pinNo); 
+		rs=s.executeQuery("select * from accountDetails2 where AccountNo = "+accountNo+" AND Pin = "+pinNo); 
 		
 		while(rs.next()) {
 			if(rs.getString(1)==null && rs.getInt(4)==0) {   //checking is account is found or not
-				isAccfound=false;                            //set isAccfound is false if Account not found
-			}else {
-			isAccfound=true;                                //if account found
-			accInfo.setAccountName(rs.getString(1));      //getting data from database and set Account Information 
-			accInfo.setAvailableBalance(rs.getInt(4));
+				isAccountfound=false;                            //set isAccountfound is false if Account not found
 			}
+			else {
+			isAccountfound=true;                                //if account found
+			
+			accountName=rs.getString(1);
+			availableBalance=rs.getInt(4);
+			
+			}
+			
+	        switch(transActionMode) {
+			
+			case "deposit":  
+				availableBalance+=amount;         //sum the deposit amount and available balance to totAmt 
+				break;
+			
+			case "withdraw":
+				if(amount<availableBalance) {           //checking the withdrawn amount must less than the available balance
+				availableBalance-=amount;            //less the withdrawn amount from available balance 
+				}else {
+					System.out.println("you have insufficent Amount to withdraw");
+				}
+				break;
+				
+			default: break;	
+			}
+	        
+	        if(amount!=0) {
+	        ps = connection.prepareStatement("update accountDetails2 set Depoist = "+availableBalance+
+					                " where AccountNo = "+accountNo);       //set the total amount in the database
+			ps.executeUpdate();
+			System.out.println("Amount successfully "+transActionMode);
+	        }
 		}
-	} catch (SQLException e) {
+		}
+	} 
+	catch (SQLException e) {
+		
+		if(e.getErrorCode() == 1062 ){
+		     System.out.println("Transaction failed");
+		    }
+		
 		System.out.println("ERROR OCCURED : "+e+" ERROR CODE : "+e.getErrorCode());
-	}catch (InputMismatchException eInMis) {
-		System.out.println("Input Mismatched"+eInMis);		
-	}catch (NullPointerException nullExp) {
-		System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
 	}
 	finally {
-		try {
+		if(connection!=null) {
+		
+			try {
 			connection.close();   //try to close the connection
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			System.out.println("ERROR OCCURED during closing the connection ERROR : "+e.getMessage());
-		}catch (NullPointerException nullExp) {  //if the connection is null this block will be execute
-			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
+		}
 		}
 	}
 	}
-	
-	//showing name and available balance 
-	void showDetails() {
-		accountDetails(accountNo, pinNo);   //call accountDetails method to get updated details after withdraw or deposit
-		this.accountName=accInfo.getAccountName();  
-		this.avalBal=accInfo.getAvailableBalance();
-		System.out.println(".......Account Details......");
-		System.out.println("Name :"+accountName);
-		System.out.println("Available balance :"+avalBal);
-	}
-	
-	//in deposit section the deposit amount will be inserted in database
-	void depoistSection(int depAmt) {
-		int totAmt=depAmt+avalBal;     //sum the deposit amount and available balance to totAmt 
-		Connection connection=db.getConnection();
-		PreparedStatement ps;
-		try {
-			ps = connection.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
-					  " where AccountNo = "+accountNo);       //set the total amount in the database
-			ps.executeUpdate();
-			System.out.println("Amount depoisted successfully");
-		} catch (SQLException e) {
-			System.out.println("Amount cannot be depoisted try again "+e);
-		}catch (InputMismatchException eInMis) {
-			System.out.println("Input Mismatched"+eInMis);
-		}catch (NullPointerException nullExp) {
-			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
-		}catch (Exception e) {
-			System.out.println("Server Down...");
-		}
-		finally {
-			try {
-				connection.close();                 //try to close the connection
-			} catch (SQLException e) {
-				System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
-			}catch (NullPointerException nullExp) {   
-				System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
-			}
-		}
-	}
-	
-	void withSection(int witAmt) {
-		if(witAmt<avalBal) {   //checking the withdrawn amount must less than the available balance
-		int totAmt=avalBal-witAmt;   //less the withdrawn amount from available balance 
-		Connection connection=db.getConnection();
-		PreparedStatement ps;
-		try {
-			ps = connection.prepareStatement("update accountDetails2 set Depoist = "+totAmt+
-					  " where AccountNo = "+accountNo); //set the total amount in the database
-			ps.executeUpdate();
-			System.out.println("Amount Withdrawed successful");
-		} catch (SQLException e) {
-			System.out.println("Amount cannot be withdraw try again "+e);
-		}catch (InputMismatchException eInMis) {
-			System.out.println("Input Mismatched"+eInMis);
-		}catch (NullPointerException nullExp) {
-			System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
-		}
-		finally {
-			try {
-				connection.close();     //try to close the connection
-			} catch (SQLException e) {
-				System.out.println("ERROR OCCURED during closing the connection ERROR : "+e);
-
-			}catch (NullPointerException nullExp) {
-				System.out.println("Connection Cannot be closed because connection is null "+nullExp.getMessage());
-			}
-		}
-	}
-		else {
-			System.out.println("you have insufficent Amount to withdraw");
-			
-		}
-	}
-	
-	
-
+    }
 }
