@@ -9,32 +9,33 @@ import java.util.InputMismatchException;
 import java.util.Random;
 
 public class AccountRegistration {
-	Boolean isAccountRegistered;
-	DbConnection dbConnection;
+
  
 	
 	//getting register account name and account number
-	void register(String regAccountName, String regAccountNo, int rPinNo) {
+	void register(String registerAccountName, String registerAccountNo, int registerPinNo) {
 		
-		dbConnection=DbConnection.getInstance();
+		DbConnection dbConnection=DbConnection.getInstance();
 		Connection connection=dbConnection.getConnection();
-		PreparedStatement ps;
 		
-		if(regAccountName!=null && regAccountNo!=null && rPinNo!=0) {  //checking accountName and accountNumber not null and pin not 0
-		if(connection!=null) {
+		
+		if(registerAccountName!=null && registerAccountNo!=null && !registerAccountName.isEmpty() && !registerAccountNo.isEmpty()) {  //checking accountName and accountNumber not null and pin not 0
+		
+			if(registerAccountNo.length()==16 && registerPinNo>999 && registerPinNo<10000) {
+			if(connection!=null) {
 			
 		try {
-			ps = connection.prepareStatement("insert into accountDetails2 values (?,?,?,?)");
-			ps.setString(1, regAccountName);
-			ps.setString(2, regAccountNo);
-			ps.setInt(3, rPinNo);
+			PreparedStatement ps = connection.prepareStatement("insert into accountDetails2 values (?,?,?,?)");
+			ps.setString(1, registerAccountName);
+			ps.setString(2, registerAccountNo);
+			ps.setInt(3, registerPinNo);
 			ps.setInt(4, 0);
 			ps.executeUpdate();
-			isAccountRegistered=true;
+			System.out.println("Account registration completed. Login to continue");
 		} 
 		catch (SQLException e) {
 			if(e.getErrorCode() == 1062 ){
-		     isAccountRegistered=false;
+		     System.out.println("The Account is already exists");
 		    }
 			System.out.println("ERROR : "+e.getErrorCode());
 		}
@@ -55,6 +56,9 @@ public class AccountRegistration {
 		}
 		}
 		else {
+			System.out.println("Account Number must be 16 digit or Account pin must be 4 digit");
+		}
+		}else {
 			System.out.println("Registration Values are null");
 		}
 	}
